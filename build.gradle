@@ -1,0 +1,22 @@
+plugins {
+    id 'com.github.ben-manes.versions' version '0.51.0'
+    id 'groovy'
+    id 'application'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.apache.groovy:groovy:5.0.0-alpha-11"
+    implementation "org.apache.lucene:lucene-core:10.0.0"
+    implementation "org.apache.lucene:lucene-queryparser:10.0.0"
+    implementation "org.apache.lucene:lucene-highlighter:10.0.0"
+    implementation "org.apache.lucene:lucene-analysis-common:10.0.0"
+}
+
+application {
+    mainClass = 'Main'
+    applicationDefaultJvmArgs = ['--add-modules', 'jdk.incubator.vector']
+}
