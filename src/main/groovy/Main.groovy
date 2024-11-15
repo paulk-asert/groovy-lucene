@@ -66,9 +66,9 @@ List<String> handleHit(ScoreDoc hit, Query query, DirectoryReader dirReader) {
     boolean phraseHighlight = Boolean.TRUE
     boolean fieldMatch = Boolean.TRUE
     FieldQuery fieldQuery = new FieldQuery(query, dirReader, phraseHighlight, fieldMatch)
-    FieldTermStack fieldTermStack = new FieldTermStack(dirReader, hit.doc, 'content', fieldQuery)
-    FieldPhraseList fieldPhraseList = new FieldPhraseList(fieldTermStack, fieldQuery)
-    fieldPhraseList.phraseList*.termsInfos*.text.flatten()
+    FieldTermStack stack = new FieldTermStack(dirReader, hit.doc, 'content', fieldQuery)
+    FieldPhraseList phrases = new FieldPhraseList(stack, fieldQuery)
+    phrases.phraseList*.termsInfos*.text.flatten()
 }
 
 class ApacheProjectAnalyzer extends Analyzer {
