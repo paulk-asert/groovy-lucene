@@ -8,7 +8,7 @@ classifying-iris-flowers-with-deep.adoc: [eclipse deeplearning4j:5, apache commo
 fruity-eclipse-collections.adoc: [eclipse collections:9, apache commons math:1]
 groovy-list-processing-cheat-sheet.adoc: [eclipse collections:4, apache commons collections:3]
 groovy-null-processing.adoc: [eclipse collections:6, apache commons collections:4]
-matrix-calculations-with-groovy-apache.adoc: [apache commons math:6, eclipse deeplearning4j:1, apache commons:1, eclipse https:1]
+matrix-calculations-with-groovy-apache.adoc: [apache commons math:6, eclipse deeplearning4j:1, apache commons:1]
 apache-nlpcraft-with-groovy.adoc: [apache nlpcraft:5]
 community-over-code-eu-2024.adoc: [apache ofbiz:1, apache commons math:2, apache ignite:1]
 community-over-code-na-2023.adoc: [apache ignite:8, apache commons numbers:1, apache commons csv:1]
@@ -17,7 +17,7 @@ deep-learning-and-eclipse-collections.adoc: [eclipse collections:7, eclipse deep
 detecting-objects-with-groovy-the.adoc: [apache mxnet:12]
 fun-with-obfuscated-groovy.adoc: [apache commons math:1]
 groovy-2-5-clibuilder-renewal.adoc: [apache commons cli:2]
-groovy-graph-databases.adoc: [apache age:11, apache hugegraph:3, apache tinkerpop:3, apache https:1]
+groovy-graph-databases.adoc: [apache age:11, apache hugegraph:3, apache tinkerpop:3]
 groovy-haiku-processing.adoc: [eclipse collections:3]
 groovy-pekko-gpars.adoc: [apache pekko:4]
 groovy-record-performance.adoc: [apache commons codec:1]
@@ -49,12 +49,10 @@ apache tinkerpop (3)             ███▏
 apache commons cli (2)           ██▏
 apache opennlp (2)               ██▏
 apache commons (1)               █▏
-eclipse https (1)                █▏
 apache ofbiz (1)                 █▏
 apache commons numbers (1)       █▏
-apache https (1)                 █▏
 apache commons codec (1)         █▏
 apache commons io (1)            █▏
 apache kie (1)                   █▏
-apache flink (1)                 █
+apache flink (1)                 █▏
 </pre>
