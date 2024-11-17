@@ -88,6 +88,7 @@ class ApacheProjectAnalyzer extends Analyzer {
                       | users
                       | software
                       | projects
+                      | https
                       | technologies
                       )
                 )\w+)               # end capture #2
