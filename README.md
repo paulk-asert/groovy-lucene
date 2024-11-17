@@ -31,6 +31,7 @@ using-groovy-with-apache-wayang.adoc: [apache wayang:9, apache spark:7, apache f
 whiskey-clustering-with-groovy-and.adoc: [apache ignite:7, apache wayang:1, apache spark:2, apache commons csv:2]
 wordle-checker.adoc: [eclipse collections:3]
 zipping-collections-with-groovy.adoc: [eclipse collections:4]
+
 eclipse collections (50)         ██████████████████████████████████████████████████▏
 apache ignite (17)               █████████████████▏
 apache commons math (16)         ████████████████▏
