@@ -45,7 +45,7 @@ var reader = DirectoryReader.open(indexDir)
 var searcher = new IndexSearcher(reader)
 var parser = new QueryParser("content", analyzer)
 
-var query = parser.parse('apache*')
+var query = parser.parse('apache* OR eclipse*')
 var results = searcher.search(query, 30)
 println "Total documents with hits for $query --> $results.totalHits"
 
@@ -54,12 +54,12 @@ var histogram = [:].withDefault { 0 }
 results.scoreDocs.each { ScoreDoc doc ->
     var document = storedFields.document(doc.doc)
     var found = handleHit(doc, query, reader)
-    println "${document.get('name')}: ${found*.replaceAll('\n', ' ').toUnique().join(', ')}"
+    println "${document.get('name')}: ${found*.replaceAll('\n', ' ').countBy()}"
     found.each { histogram[it.replaceAll('\n', ' ')] += 1 }
 }
 histogram.sort { e -> -e.value }.each { k, v ->
     var label = "$k ($v)"
-    println "${label.padRight(40)} ${bar(v * 2, 0, 40, 40)}"
+    println "${label.padRight(32)} ${bar(v, 0, 50, 50)}"
 }
 
 List<String> handleHit(ScoreDoc hit, Query query, DirectoryReader dirReader) {
@@ -72,7 +72,28 @@ List<String> handleHit(ScoreDoc hit, Query query, DirectoryReader dirReader) {
 }
 
 class ApacheProjectAnalyzer extends Analyzer {
-    private static final String tokenRegex = /(?i)\b(apache\s(commons\s)?(?!(groovy|and|license|software|projects|technologies))\w+)|(?!(apache\s)(\w+))/
+    private static final String tokenRegex = $/(?ix) # ignore case, enable whitespace/comments
+        \b                          # word boundary
+        (                           # start capture of project name
+            (apache|eclipse)\s      # foundation name
+            (commons\s)?            # optional subproject name
+                (                   # capture next word unless excluded word
+                    ?!(
+                        groovy      # excluded words
+                      | and
+                      | license
+                      | users
+                      | software
+                      | projects
+                      | technologies
+                      )
+                )\w+)               # end capture #2
+            |                       # alternatively, just take the next word
+                (?!(
+                    apache|eclipse
+                )\s(\w+)            # any word not starting with foundation name
+        )                           # end capture #1
+    /$
 
     @Override
     protected TokenStreamComponents createComponents(String fieldName) {
