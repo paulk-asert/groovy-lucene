@@ -18,6 +18,7 @@ import org.apache.lucene.search.vectorhighlight.FieldQuery
 import org.apache.lucene.search.vectorhighlight.FieldTermStack
 import org.apache.lucene.store.ByteBuffersDirectory
 
+import static Regex.tokenRegex
 import static org.codehaus.groovy.util.StringUtil.bar
 
 var analyzer = new ApacheProjectAnalyzer()
@@ -75,30 +76,6 @@ List<String> handleHit(ScoreDoc hit, Query query, DirectoryReader dirReader) {
 }
 
 class ApacheProjectAnalyzer extends Analyzer {
-    private static final String tokenRegex = $/(?ix) # ignore case, enable whitespace/comments
-        \b                          # word boundary
-        (                           # start capture of project name
-            (apache|eclipse)\s      # foundation name
-            (commons\s)?            # optional subproject name
-                (                   # capture next word unless excluded word
-                    ?!(
-                        groovy      # excluded words
-                      | and
-                      | license
-                      | users
-                      | software
-                      | projects
-                      | https
-                      | technologies
-                      )
-                )\w+)               # end capture #2
-            |                       # alternatively, just take the next word
-                (?!(
-                    apache|eclipse
-                )\s(\w+)            # any word not starting with foundation name
-        )                           # end capture #1
-    /$
-
     @Override
     protected TokenStreamComponents createComponents(String fieldName) {
         var src = new PatternTokenizer(~tokenRegex, 0)
