@@ -1,6 +1,6 @@
 Source code for: https://groovy.apache.org/blog/groovy-lucene
 
-Output for the `runMatcher` and `runLucene` tasks:
+Output for the `runMatcher` (just ignore the first line) and `runLucene` tasks:
 
 <pre>
 Total documents with hits for content:apache* content:eclipse* --> 28 hits
