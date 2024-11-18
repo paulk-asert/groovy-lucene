@@ -24,23 +24,23 @@ import static org.codehaus.groovy.util.StringUtil.bar
 var analyzer = new ApacheProjectAnalyzer()
 var indexDir = new ByteBuffersDirectory()
 var config = new IndexWriterConfig(analyzer)
-var writer = new IndexWriter(indexDir, config)
 
 var blogBaseDir = '/projects/apache-websites/groovy-website/site/src/site/blog'
-new File(blogBaseDir).traverse(nameFilter: ~/.*\.adoc/) { file ->
-    file.withReader { br ->
-        var document = new Document()
-        var fieldType = new FieldType(stored: true,
-            indexOptions: IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS,
-            storeTermVectors: true,
-            storeTermVectorPositions: true,
-            storeTermVectorOffsets: true)
-        document.add(new Field('content', br.text, fieldType))
-        document.add(new StringField('name', file.name, Field.Store.YES))
-        writer.addDocument(document)
+new IndexWriter(indexDir, config).withCloseable { writer ->
+    new File(blogBaseDir).traverse(nameFilter: ~/.*\.adoc/) { file ->
+        file.withReader { br ->
+            var document = new Document()
+            var fieldType = new FieldType(stored: true,
+                indexOptions: IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS,
+                storeTermVectors: true,
+                storeTermVectorPositions: true,
+                storeTermVectorOffsets: true)
+            document.add(new Field('content', br.text, fieldType))
+            document.add(new StringField('name', file.name, Field.Store.YES))
+            writer.addDocument(document)
+        }
     }
 }
-writer.close()
 
 var reader = DirectoryReader.open(indexDir)
 var searcher = new IndexSearcher(reader)
