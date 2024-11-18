@@ -6,10 +6,11 @@ var histogram = [:].withDefault { 0 }
 
 new File(blogBaseDir).traverse(nameFilter: ~/.*\.adoc/) { file ->
     var m = file.text =~ tokenRegex
-    var projects = m*.get(2).grep()*.toLowerCase()*.replaceAll('\n', ' ').countBy()
-    if (projects) {
-        println "$file.name: $projects"
-        projects.each { k, v -> histogram[k] += v }
+    var projects = m*.get(2).grep()*.toLowerCase()*.replaceAll('\n', ' ')
+    var counts = projects.countBy()
+    if (counts) {
+        println "$file.name: $counts"
+        counts.each { k, v -> histogram[k] += v }
     }
 }
 
