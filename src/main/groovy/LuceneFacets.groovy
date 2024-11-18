@@ -73,6 +73,7 @@ var hitCounts = projects.getTopChildren(10, "projectHitCounts")
 var fileCounts = facets.getTopChildren(10, "projectFileCounts")
 var nameCounts = facets.getTopChildren(10, "projectNameCounts")
 
-println "\n$hitCounts"
-println "\n$fileCounts"
-println "\n$nameCounts"
+println()
+println hitCounts
+println fileCounts
+println nameCounts
