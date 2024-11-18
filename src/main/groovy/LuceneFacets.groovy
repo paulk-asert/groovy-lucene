@@ -15,8 +15,10 @@ import org.apache.lucene.index.DirectoryReader
 import org.apache.lucene.index.IndexOptions
 import org.apache.lucene.index.IndexWriter
 import org.apache.lucene.index.IndexWriterConfig
+import org.apache.lucene.queryparser.classic.QueryParser
 import org.apache.lucene.search.IndexSearcher
 import org.apache.lucene.search.MatchAllDocsQuery
+import org.apache.lucene.search.ScoreDoc
 import org.apache.lucene.store.ByteBuffersDirectory
 import static Regex.tokenRegex
 
@@ -83,3 +85,13 @@ nameCounts = facets.getTopChildren(10, "projectNameCounts", 'apache')
 println nameCounts
 nameCounts = facets.getTopChildren(10, "projectNameCounts", 'apache', 'commons')
 println nameCounts
+
+var parser = new QueryParser("content", analyzer)
+var query = parser.parse('apache* AND eclipse*')
+var results = searcher.search(query, 10)
+println "Total documents with hits for $query --> $results.totalHits"
+var storedFields = searcher.storedFields()
+results.scoreDocs.each { ScoreDoc doc ->
+    var document = storedFields.document(doc.doc)
+    println "${document.get('name')}"
+}

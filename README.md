@@ -139,4 +139,11 @@ dim=projectNameCounts path=[apache, commons] value=-1 childCount=7
   cli (1)
   codec (1)
   io (1)
+
+Total documents with hits for +content:apache* +content:eclipse* --> 5 hits
+classifying-iris-flowers-with-deep.adoc
+fruity-eclipse-collections.adoc
+groovy-list-processing-cheat-sheet.adoc
+groovy-null-processing.adoc
+matrix-calculations-with-groovy-apache.adoc
 </pre>
