@@ -15,7 +15,6 @@ new File(blogBaseDir).traverse(nameFilter: ~/.*\.adoc/) { file ->
 }
 
 println()
-
 histogram.sort { e -> -e.value }.each { k, v ->
     var label = "$k ($v)"
     println "${label.padRight(32)} ${bar(v, 0, 50, 50)}"
