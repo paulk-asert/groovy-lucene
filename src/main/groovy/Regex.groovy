@@ -14,6 +14,8 @@ class Regex {
                           | software
                           | projects
                           | https
+                          | or
+                          | prefixes
                           | technologies
                           )
                     )\w+                     # end capture #2
