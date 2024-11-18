@@ -38,7 +38,7 @@ var fConfig = new FacetsConfig().tap {
 var blogBaseDir = '/projects/apache-websites/groovy-website/site/src/site/blog'
 new File(blogBaseDir).traverse(nameFilter: ~/.*\.adoc/) { file ->
     var m = file.text =~ tokenRegex
-    var projects = m*.get(0)*.toLowerCase()*.replaceAll('\n', ' ').countBy()
+    var projects = m*.get(2).grep()*.toLowerCase()*.replaceAll('\n', ' ').countBy()
     file.withReader { br ->
         var document = new Document()
         var fieldType = new FieldType(stored: true,
