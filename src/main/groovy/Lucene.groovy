@@ -66,8 +66,8 @@ histogram.sort { e -> -e.value }.each { k, v ->
 }
 
 List<String> handleHit(ScoreDoc hit, Query query, DirectoryReader dirReader) {
-    boolean phraseHighlight = Boolean.TRUE
-    boolean fieldMatch = Boolean.TRUE
+    boolean phraseHighlight = true
+    boolean fieldMatch = true
     FieldQuery fieldQuery = new FieldQuery(query, dirReader, phraseHighlight, fieldMatch)
     FieldTermStack stack = new FieldTermStack(dirReader, hit.doc, 'content', fieldQuery)
     FieldPhraseList phrases = new FieldPhraseList(stack, fieldQuery)
