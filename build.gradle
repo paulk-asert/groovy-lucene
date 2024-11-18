@@ -1,7 +1,6 @@
 plugins {
     id 'com.github.ben-manes.versions' version '0.51.0'
     id 'groovy'
-    id 'application'
 }
 
 repositories {
@@ -16,7 +15,17 @@ dependencies {
     implementation "org.apache.lucene:lucene-analysis-common:10.0.0"
 }
 
-application {
-    mainClass = 'Main'
-    applicationDefaultJvmArgs = ['--add-modules', 'jdk.incubator.vector']
+sourceSets.main.allSource.files.each { file ->
+    def name = "${file.name - '.groovy'}"
+    if (name == 'Regex') return
+    def subtask = tasks.register("run$name", JavaExec) {
+        dependsOn compileGroovy
+        group 'Application'
+        description "Run $file.name as a JVM application/Groovy script"
+        if (name.startsWith('Lucene')) {
+            jvmArgs = ['--add-modules', 'jdk.incubator.vector']
+        }
+        classpath = sourceSets.main.runtimeClasspath
+        mainClass = name
+    }
 }
