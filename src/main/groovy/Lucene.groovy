@@ -58,7 +58,6 @@ results.scoreDocs.each { ScoreDoc doc ->
     println "${document.get('name')}: ${found*.replaceAll('\n', ' ').countBy()}"
     found.each { histogram[it.replaceAll('\n', ' ')] += 1 }
 }
-
 println()
 
 histogram.sort { e -> -e.value }.each { k, v ->
