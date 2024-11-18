@@ -61,19 +61,25 @@ new File(blogBaseDir).traverse(nameFilter: ~/.*\.adoc/) { file ->
 }
 indexWriter.close()
 taxonWriter.close()
+println()
 
 var reader = DirectoryReader.open(indexDir)
 var searcher = new IndexSearcher(reader)
 var taxonReader = new DirectoryTaxonomyReader(taxonDir)
 var fcm = new FacetsCollectorManager()
 var fc = FacetsCollectorManager.search(searcher, new MatchAllDocsQuery(), 10, fcm).facetsCollector()
-var projects = new TaxonomyFacetIntAssociations('$projectHitCounts', taxonReader, fConfig, fc, AssociationAggregationFunction.SUM)
-var facets = new FastTaxonomyFacetCounts(taxonReader, fConfig, fc)
-var hitCounts = projects.getTopChildren(10, "projectHitCounts")
-var fileCounts = facets.getTopChildren(10, "projectFileCounts")
-var nameCounts = facets.getTopChildren(10, "projectNameCounts")
 
-println()
+var projects = new TaxonomyFacetIntAssociations('$projectHitCounts', taxonReader, fConfig, fc, AssociationAggregationFunction.SUM)
+var hitCounts = projects.getTopChildren(10, "projectHitCounts")
 println hitCounts
+
+var facets = new FastTaxonomyFacetCounts(taxonReader, fConfig, fc)
+var fileCounts = facets.getTopChildren(10, "projectFileCounts")
 println fileCounts
+
+var nameCounts = facets.getTopChildren(10, "projectNameCounts")
+println nameCounts
+nameCounts = facets.getTopChildren(10, "projectNameCounts", 'apache')
+println nameCounts
+nameCounts = facets.getTopChildren(10, "projectNameCounts", 'apache', 'commons')
 println nameCounts

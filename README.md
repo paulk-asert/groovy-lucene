@@ -103,7 +103,6 @@ dim=projectHitCounts path=[] value=-1 childCount=24
   apache commons collections (7)
   apache nlpcraft (5)
 
-
 dim=projectFileCounts path=[] value=-1 childCount=24
   eclipse collections (10)
   apache commons math (7)
@@ -116,8 +115,28 @@ dim=projectFileCounts path=[] value=-1 childCount=24
   apache wayang (2)
   apache nlpcraft (1)
 
-
 dim=projectNameCounts path=[] value=-1 childCount=2
   apache (21)
   eclipse (12)
+
+dim=projectNameCounts path=[apache] value=-1 childCount=15
+  commons (16)
+  spark (4)
+  ignite (4)
+  wayang (2)
+  nlpcraft (1)
+  ofbiz (1)
+  mxnet (1)
+  age (1)
+  hugegraph (1)
+  tinkerpop (1)
+
+dim=projectNameCounts path=[apache, commons] value=-1 childCount=7
+  math (7)
+  csv (4)
+  collections (2)
+  numbers (1)
+  cli (1)
+  codec (1)
+  io (1)
 </pre>
