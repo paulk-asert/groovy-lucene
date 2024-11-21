@@ -21,6 +21,7 @@ import org.apache.lucene.search.MatchAllDocsQuery
 import org.apache.lucene.search.ScoreDoc
 import org.apache.lucene.store.ByteBuffersDirectory
 import static Regex.tokenRegex
+import static org.codehaus.groovy.util.StringUtil.bar
 
 var analyzer = new ApacheProjectAnalyzer()
 var indexDir = new ByteBuffersDirectory()
@@ -43,12 +44,10 @@ new File(blogBaseDir).traverse(nameFilter: ~/.*\.adoc/) { file ->
     var projects = m*.get(2).grep()*.toLowerCase()*.replaceAll('\n', ' ').countBy()
     file.withReader { br ->
         var document = new Document()
-        var fieldType = new FieldType(stored: true,
-            indexOptions: IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS,
-            storeTermVectors: true,
-            storeTermVectorPositions: true,
-            storeTermVectorOffsets: true)
-        document.add(new Field('content', br.text, fieldType))
+        var indexedWithFreq = new FieldType(stored: true,
+            indexOptions: IndexOptions.DOCS_AND_FREQS,
+            storeTermVectors: true)
+        document.add(new Field('content', br.text, indexedWithFreq))
         document.add(new StringField('name', file.name, Field.Store.YES))
         if (projects) {
             println "$file.name: $projects"
@@ -63,7 +62,6 @@ new File(blogBaseDir).traverse(nameFilter: ~/.*\.adoc/) { file ->
 }
 indexWriter.close()
 taxonWriter.close()
-println()
 
 var reader = DirectoryReader.open(indexDir)
 var searcher = new IndexSearcher(reader)
@@ -72,22 +70,37 @@ var fcm = new FacetsCollectorManager()
 var fc = FacetsCollectorManager.search(searcher, new MatchAllDocsQuery(), 10, fcm).facetsCollector()
 
 var projects = new TaxonomyFacetIntAssociations('$projectHitCounts', taxonReader, fConfig, fc, AssociationAggregationFunction.SUM)
-var hitCounts = projects.getTopChildren(10, "projectHitCounts")
+var hitCounts = projects.getTopChildren(30, "projectHitCounts").labelValues.collect{
+    [label: it.label, hits: it.value, files: it.count]
+}
 println hitCounts
 
+println "\nFrequency of total hits mentioning a project (top 10)"
+hitCounts.sort{ m -> -m.hits }.take(10).each { m ->
+    var label = "$m.label ($m.hits)"
+    println "${label.padRight(32)} ${bar(m.hits, 0, 50, 50)}"
+}
+
+println "\nFrequency of documents mentioning a project (top 10)"
+hitCounts.sort{ m -> -m.files }.take(10).each { m ->
+    var label = "$m.label ($m.files)"
+    println "${label.padRight(32)} ${bar(m.files * 2, 0, 20, 20)}"
+}
+
 var facets = new FastTaxonomyFacetCounts(taxonReader, fConfig, fc)
+var nameCounts = facets.getTopChildren(10, "projectNameCounts")
+
 var fileCounts = facets.getTopChildren(10, "projectFileCounts")
 println fileCounts
 
-var nameCounts = facets.getTopChildren(10, "projectNameCounts")
-println nameCounts
+println "\n$nameCounts"
 nameCounts = facets.getTopChildren(10, "projectNameCounts", 'apache')
 println nameCounts
 nameCounts = facets.getTopChildren(10, "projectNameCounts", 'apache', 'commons')
 println nameCounts
 
 var parser = new QueryParser("content", analyzer)
-var query = parser.parse('apache* AND eclipse*')
+var query = parser.parse(/apache\ * AND eclipse\ * AND emoji*/)
 var results = searcher.search(query, 10)
 println "Total documents with hits for $query --> $results.totalHits"
 var storedFields = searcher.storedFields()

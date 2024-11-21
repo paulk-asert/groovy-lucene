@@ -1,6 +1,3 @@
-import org.apache.lucene.analysis.Analyzer
-import org.apache.lucene.analysis.LowerCaseFilter
-import org.apache.lucene.analysis.pattern.PatternTokenizer
 import org.apache.lucene.document.Document
 import org.apache.lucene.document.Field
 import org.apache.lucene.document.FieldType
@@ -18,7 +15,6 @@ import org.apache.lucene.search.vectorhighlight.FieldQuery
 import org.apache.lucene.search.vectorhighlight.FieldTermStack
 import org.apache.lucene.store.ByteBuffersDirectory
 
-import static Regex.tokenRegex
 import static org.codehaus.groovy.util.StringUtil.bar
 
 var analyzer = new ApacheProjectAnalyzer()
@@ -46,20 +42,20 @@ var reader = DirectoryReader.open(indexDir)
 var searcher = new IndexSearcher(reader)
 var parser = new QueryParser("content", analyzer)
 
-var query = parser.parse('apache* OR eclipse*')
+var query = parser.parse(/apache\ * OR eclipse\ */)
 var results = searcher.search(query, 30)
-println "Total documents with hits for $query --> $results.totalHits"
+println "Total documents with hits for $query --> $results.totalHits\n"
 
 var storedFields = searcher.storedFields()
 var histogram = [:].withDefault { 0 }
-results.scoreDocs.each { ScoreDoc doc ->
-    var document = storedFields.document(doc.doc)
-    var found = handleHit(doc, query, reader)
-    println "${document.get('name')}: ${found*.replaceAll('\n', ' ').countBy()}"
+results.scoreDocs.each { ScoreDoc scoreDoc ->
+    var doc = storedFields.document(scoreDoc.doc)
+    var found = handleHit(scoreDoc, query, reader)
+    println "${doc.get('name')}: ${found*.replaceAll('\n', ' ').countBy()}"
     found.each { histogram[it.replaceAll('\n', ' ')] += 1 }
 }
-println()
 
+println "\nFrequency of total hits mentioning a project"
 histogram.sort { e -> -e.value }.each { k, v ->
     var label = "$k ($v)"
     println "${label.padRight(32)} ${bar(v, 0, 50, 50)}"
@@ -68,17 +64,8 @@ histogram.sort { e -> -e.value }.each { k, v ->
 List<String> handleHit(ScoreDoc hit, Query query, DirectoryReader dirReader) {
     boolean phraseHighlight = true
     boolean fieldMatch = true
-    FieldQuery fieldQuery = new FieldQuery(query, dirReader, phraseHighlight, fieldMatch)
-    FieldTermStack stack = new FieldTermStack(dirReader, hit.doc, 'content', fieldQuery)
-    FieldPhraseList phrases = new FieldPhraseList(stack, fieldQuery)
+    var fieldQuery = new FieldQuery(query, dirReader, phraseHighlight, fieldMatch)
+    var stack = new FieldTermStack(dirReader, hit.doc, 'content', fieldQuery)
+    var phrases = new FieldPhraseList(stack, fieldQuery)
     phrases.phraseList*.termsInfos*.text.flatten()
-}
-
-class ApacheProjectAnalyzer extends Analyzer {
-    @Override
-    protected TokenStreamComponents createComponents(String fieldName) {
-        var src = new PatternTokenizer(~tokenRegex, 0)
-        var result = new LowerCaseFilter(src)
-        new TokenStreamComponents(src, result)
-    }
 }
