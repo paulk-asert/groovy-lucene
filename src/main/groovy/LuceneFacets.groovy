@@ -19,10 +19,12 @@ import org.apache.lucene.queryparser.classic.QueryParser
 import org.apache.lucene.search.IndexSearcher
 import org.apache.lucene.search.MatchAllDocsQuery
 import org.apache.lucene.store.ByteBuffersDirectory
-import static Regex.tokenRegex
+
+import static Common.baseDir
+import static Common.tokenRegex
 import static org.codehaus.groovy.util.StringUtil.bar
 
-var analyzer = new ApacheProjectAnalyzer()
+var analyzer = new ProjectNameAnalyzer()
 var indexDir = new ByteBuffersDirectory()
 var taxonDir = new ByteBuffersDirectory()
 var config = new IndexWriterConfig(analyzer)
@@ -37,8 +39,7 @@ var fConfig = new FacetsConfig().tap {
     setIndexFieldName('projectHitCounts', '$projectHitCounts')
 }
 
-var blogBaseDir = '/projects/apache-websites/groovy-website/site/src/site/blog'
-new File(blogBaseDir).traverse(nameFilter: ~/.*\.adoc/) { file ->
+new File(baseDir).traverse(nameFilter: ~/.*\.adoc/) { file ->
     var m = file.text =~ tokenRegex
     var projects = m*.get(2).grep()*.toLowerCase()*.replaceAll('\n', ' ').countBy()
     file.withReader { br ->
@@ -74,13 +75,13 @@ var hitCounts = projects.getTopChildren(30, "projectHitCounts").labelValues.coll
 }
 println hitCounts
 
-println "\nFrequency of total hits mentioning a project (top 10)"
+println "\nFrequency of total hits mentioning a project (top 10):"
 hitCounts.sort{ m -> -m.hits }.take(10).each { m ->
     var label = "$m.label ($m.hits)"
     println "${label.padRight(32)} ${bar(m.hits, 0, 50, 50)}"
 }
 
-println "\nFrequency of documents mentioning a project (top 10)"
+println "\nFrequency of documents mentioning a project (top 10):"
 hitCounts.sort{ m -> -m.files }.take(10).each { m ->
     var label = "$m.label ($m.files)"
     println "${label.padRight(32)} ${bar(m.files * 2, 0, 20, 20)}"

@@ -19,13 +19,14 @@ import org.apache.lucene.search.IndexSearcher
 import org.apache.lucene.search.RegexpQuery
 import org.apache.lucene.store.ByteBuffersDirectory
 
+import static Common.baseDir
+
 var analyzer = new StandardAnalyzer()
 var indexDir = new ByteBuffersDirectory()
 var config = new IndexWriterConfig(analyzer)
 
-var blogBaseDir = '/projects/apache-websites/groovy-website/site/src/site/blog'
 new IndexWriter(indexDir, config).withCloseable { writer ->
-    new File(blogBaseDir).traverse(nameFilter: ~/.*\.adoc/) { file ->
+    new File(baseDir).traverse(nameFilter: ~/.*\.adoc/) { file ->
         file.withReader { br ->
             var document = new Document()
             var fieldType = new FieldType(stored: true,

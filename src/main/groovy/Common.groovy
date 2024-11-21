@@ -1,4 +1,4 @@
-class Regex {
+class Common {
     public static String tokenRegex = /(?ix) # ignore case, enable whitespace & comments
         \b                                   # word boundary
         (                                    # start capture of all terms
@@ -18,4 +18,6 @@ class Regex {
             )                                # end capture non-project term
         )                                    # end capture term
     /
+
+    public static String baseDir = '/projects/apache-websites/groovy-website/site/src/site/blog'
 }

@@ -15,15 +15,15 @@ import org.apache.lucene.search.vectorhighlight.FieldQuery
 import org.apache.lucene.search.vectorhighlight.FieldTermStack
 import org.apache.lucene.store.ByteBuffersDirectory
 
+import static Common.baseDir
 import static org.codehaus.groovy.util.StringUtil.bar
 
-var analyzer = new ApacheProjectAnalyzer()
+var analyzer = new ProjectNameAnalyzer()
 var indexDir = new ByteBuffersDirectory()
 var config = new IndexWriterConfig(analyzer)
 
-var blogBaseDir = '/projects/apache-websites/groovy-website/site/src/site/blog'
 new IndexWriter(indexDir, config).withCloseable { writer ->
-    new File(blogBaseDir).traverse(nameFilter: ~/.*\.adoc/) { file ->
+    new File(baseDir).traverse(nameFilter: ~/.*\.adoc/) { file ->
         file.withReader { br ->
             var document = new Document()
             var fieldType = new FieldType(stored: true,
@@ -55,7 +55,7 @@ results.scoreDocs.each { ScoreDoc scoreDoc ->
     found.each { histogram[it.replaceAll('\n', ' ')] += 1 }
 }
 
-println "\nFrequency of total hits mentioning a project"
+println "\nFrequency of total hits mentioning a project:"
 histogram.sort { e -> -e.value }.each { k, v ->
     var label = "$k ($v)"
     println "${label.padRight(32)} ${bar(v, 0, 50, 50)}"

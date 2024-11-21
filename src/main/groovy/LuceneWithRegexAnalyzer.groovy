@@ -1,6 +1,3 @@
-import org.apache.lucene.analysis.Analyzer
-import org.apache.lucene.analysis.LowerCaseFilter
-import org.apache.lucene.analysis.pattern.PatternTokenizer
 import org.apache.lucene.document.Document
 import org.apache.lucene.document.Field
 import org.apache.lucene.document.FieldType
@@ -17,11 +14,10 @@ import org.apache.lucene.search.DocIdSetIterator
 import org.apache.lucene.search.IndexSearcher
 import org.apache.lucene.store.ByteBuffersDirectory
 
-import static Regex.tokenRegex
+import static Common.baseDir
 import static org.codehaus.groovy.util.StringUtil.bar
 
-var blogBaseDir = '/projects/apache-websites/groovy-website/site/src/site/blog'
-var analyzer = new ApacheProjectAnalyzer()
+var analyzer = new ProjectNameAnalyzer()
 var indexDir = new ByteBuffersDirectory()
 var config = new IndexWriterConfig(analyzer)
 
@@ -29,7 +25,7 @@ new IndexWriter(indexDir, config).withCloseable { writer ->
     var indexedWithFreq = new FieldType(stored: true,
         indexOptions: IndexOptions.DOCS_AND_FREQS,
         storeTermVectors: true)
-    new File(blogBaseDir).traverse(nameFilter: ~/.*\.adoc/) { file ->
+    new File(baseDir).traverse(nameFilter: ~/.*\.adoc/) { file ->
         file.withReader { br ->
             var document = new Document()
             document.add(new Field('content', br.text, indexedWithFreq))
@@ -67,14 +63,14 @@ for (docId in 0..<reader.maxDoc()) {
 var terms = projects.collect { name -> new Term('content', name) }
 var byReverseValue = { e -> -e.value }
 
-println "\nFrequency of documents mentioning a project (top 10)"
+println "\nFrequency of documents mentioning a project (top 10):"
 var docFreq = terms.collectEntries { term -> [term.text(), reader.docFreq(term)] }
 docFreq.sort(byReverseValue).take(10).each { k, v ->
     var label = "$k ($v)"
     println "${label.padRight(32)} ${bar(v * 2, 0, 20, 20)}"
 }
 
-println "\nFrequency of total hits mentioning a project (top 10)"
+println "\nFrequency of total hits mentioning a project (top 10):"
 var termFreq = terms.collectEntries { term -> [term.text(), reader.totalTermFreq(term)] }
 termFreq.sort(byReverseValue).take(10).each { k, v ->
     var label = "$k ($v)"
@@ -91,11 +87,3 @@ results.scoreDocs.each {
     println "${doc.get('name')}"
 }
 
-class ApacheProjectAnalyzer extends Analyzer {
-    @Override
-    protected TokenStreamComponents createComponents(String fieldName) {
-        var src = new PatternTokenizer(~tokenRegex, 0)
-        var result = new LowerCaseFilter(src)
-        new TokenStreamComponents(src, result)
-    }
-}
