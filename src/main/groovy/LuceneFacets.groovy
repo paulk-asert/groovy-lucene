@@ -18,7 +18,6 @@ import org.apache.lucene.index.IndexWriterConfig
 import org.apache.lucene.queryparser.classic.QueryParser
 import org.apache.lucene.search.IndexSearcher
 import org.apache.lucene.search.MatchAllDocsQuery
-import org.apache.lucene.search.ScoreDoc
 import org.apache.lucene.store.ByteBuffersDirectory
 import static Regex.tokenRegex
 import static org.codehaus.groovy.util.StringUtil.bar
@@ -102,9 +101,6 @@ println nameCounts
 var parser = new QueryParser("content", analyzer)
 var query = parser.parse(/apache\ * AND eclipse\ * AND emoji*/)
 var results = searcher.search(query, 10)
-println "Total documents with hits for $query --> $results.totalHits"
 var storedFields = searcher.storedFields()
-results.scoreDocs.each { ScoreDoc doc ->
-    var document = storedFields.document(doc.doc)
-    println "${document.get('name')}"
-}
+assert results.totalHits.value() == 1 &&
+    storedFields.document(results.scoreDocs[0].doc).get('name') == 'fruity-eclipse-collections.adoc'
