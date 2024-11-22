@@ -67,41 +67,41 @@ var reader = DirectoryReader.open(indexDir)
 var searcher = new IndexSearcher(reader)
 var taxonReader = new DirectoryTaxonomyReader(taxonDir)
 var fcm = new FacetsCollectorManager()
-var fc = FacetsCollectorManager.search(searcher, new MatchAllDocsQuery(), 10, fcm).facetsCollector()
+var fc = FacetsCollectorManager.search(searcher, new MatchAllDocsQuery(), 0, fcm).facetsCollector()
 
+var topN = 5
 var projects = new TaxonomyFacetIntAssociations('$projectHitCounts', taxonReader, fConfig, fc, AssociationAggregationFunction.SUM)
-var hitCounts = projects.getTopChildren(30, "projectHitCounts").labelValues.collect{
+var hitCounts = projects.getTopChildren(topN, "projectHitCounts").labelValues.collect{
     [label: it.label, hits: it.value, files: it.count]
 }
-println hitCounts
 
-println "\nFrequency of total hits mentioning a project (top 10):"
-hitCounts.sort{ m -> -m.hits }.take(10).each { m ->
+println "\nFrequency of total hits mentioning a project (top $topN):"
+hitCounts.sort{ m -> -m.hits }.each { m ->
     var label = "$m.label ($m.hits)"
     println "${label.padRight(32)} ${bar(m.hits, 0, 50, 50)}"
 }
 
-println "\nFrequency of documents mentioning a project (top 10):"
-hitCounts.sort{ m -> -m.files }.take(10).each { m ->
+println "\nFrequency of documents mentioning a project (top $topN):"
+hitCounts.sort{ m -> -m.files }.each { m ->
     var label = "$m.label ($m.files)"
     println "${label.padRight(32)} ${bar(m.files * 2, 0, 20, 20)}"
 }
 
 var facets = new FastTaxonomyFacetCounts(taxonReader, fConfig, fc)
-var nameCounts = facets.getTopChildren(10, "projectNameCounts")
 
-var fileCounts = facets.getTopChildren(10, "projectFileCounts")
+println "\nFrequency of documents mentioning a project (top $topN):"
+var fileCounts = facets.getTopChildren(topN, "projectFileCounts")
 println fileCounts
 
-println "\n$nameCounts"
-nameCounts = facets.getTopChildren(10, "projectNameCounts", 'apache')
-println nameCounts
-nameCounts = facets.getTopChildren(10, "projectNameCounts", 'apache', 'commons')
-println nameCounts
+['apache', 'commons'].inits().reverseEach { path ->
+    println "Frequency of documents mentioning a project with path $path (top $topN):"
+    var nameCounts = facets.getTopChildren(topN, "projectNameCounts", *path)
+    println "$nameCounts"
+}
 
 var parser = new QueryParser("content", analyzer)
 var query = parser.parse(/apache\ * AND eclipse\ * AND emoji*/)
-var results = searcher.search(query, 10)
+var results = searcher.search(query, topN)
 var storedFields = searcher.storedFields()
 assert results.totalHits.value() == 1 &&
     storedFields.document(results.scoreDocs[0].doc).get('name') == 'fruity-eclipse-collections.adoc'
