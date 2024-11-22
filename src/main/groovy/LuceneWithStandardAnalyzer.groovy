@@ -44,17 +44,24 @@ new IndexWriter(indexDir, config).withCloseable { writer ->
 IndexReader reader = DirectoryReader.open(indexDir)
 var searcher = new IndexSearcher(reader)
 
-var namepart = new SpanMultiTermQueryWrapper(new RegexpQuery(new Term("content", '''(
-math|spark|lucene|collections|deeplearning4j
-|beam|wayang|csv|io|numbers|ignite|mxnet|age
-|nlpcraft|pekko|hugegraph|tinkerpop|commons
-|cli|opennlp|ofbiz|codec|kie|flink
-)'''.replaceAll('\n', ''))))
+var projects = [
+    'math', 'spark', 'lucene', 'collections', 'deeplearning4j',
+    'beam', 'wayang', 'csv', 'io', 'numbers', 'ignite', 'mxnet', 'age',
+    'nlpcraft', 'pekko', 'hugegraph', 'tinkerpop', 'commons',
+    'cli', 'opennlp', 'ofbiz', 'codec', 'kie', 'flink'
+]
+var namepart = new SpanMultiTermQueryWrapper(new RegexpQuery(
+    new Term('content', "(${projects.join('|')})")))
 
-var (apache, commons) = ['apache', 'commons'].collect{ new Term('content', it) }
-var apacheCommons = new SpanNearQuery([new SpanTermQuery(apache), new SpanTermQuery(commons), namepart] as SpanQuery[], 0, true)
+// look for apache commons <namepart>
+SpanQuery[] spanTerms = ['apache', 'commons'].collect{
+    new SpanTermQuery(new Term('content', it))
+} + namepart
+var apacheCommons = new SpanNearQuery(spanTerms, 0, true)
 
-var foundation = new SpanMultiTermQueryWrapper(new RegexpQuery(new Term("content", "(apache|eclipse)")))
+// look for (apache|eclipse) <namepart>
+var foundation = new SpanMultiTermQueryWrapper(new RegexpQuery(
+    new Term('content', '(apache|eclipse)')))
 var otherProject = new SpanNearQuery([foundation, namepart] as SpanQuery[], 0, true)
 
 var builder = new BooleanQuery.Builder(minimumNumberShouldMatch: 1)

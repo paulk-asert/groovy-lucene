@@ -55,8 +55,8 @@ results.scoreDocs.each { ScoreDoc scoreDoc ->
     found.each { histogram[it.replaceAll('\n', ' ')] += 1 }
 }
 
-println "\nFrequency of total hits mentioning a project:"
-histogram.sort { e -> -e.value }.each { k, v ->
+println "\nFrequency of total hits mentioning a project (top 10):"
+histogram.sort { e -> -e.value }.take(10).each { k, v ->
     var label = "$k ($v)"
     println "${label.padRight(32)} ${bar(v, 0, 50, 50)}"
 }
