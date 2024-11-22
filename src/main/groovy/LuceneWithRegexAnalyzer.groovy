@@ -63,18 +63,18 @@ for (docId in 0..<reader.maxDoc()) {
 var terms = projects.collect { name -> new Term('content', name) }
 var byReverseValue = { e -> -e.value }
 
-println "\nFrequency of documents mentioning a project (top 10):"
-var docFreq = terms.collectEntries { term -> [term.text(), reader.docFreq(term)] }
-docFreq.sort(byReverseValue).take(10).each { k, v ->
-    var label = "$k ($v)"
-    println "${label.padRight(32)} ${bar(v * 2, 0, 20, 20)}"
-}
-
 println "\nFrequency of total hits mentioning a project (top 10):"
 var termFreq = terms.collectEntries { term -> [term.text(), reader.totalTermFreq(term)] }
 termFreq.sort(byReverseValue).take(10).each { k, v ->
     var label = "$k ($v)"
     println "${label.padRight(32)} ${bar(v, 0, 50, 50)}"
+}
+
+println "\nFrequency of documents mentioning a project (top 10):"
+var docFreq = terms.collectEntries { term -> [term.text(), reader.docFreq(term)] }
+docFreq.sort(byReverseValue).take(10).each { k, v ->
+    var label = "$k ($v)"
+    println "${label.padRight(32)} ${bar(v * 2, 0, 20, 20)}"
 }
 
 var parser = new QueryParser("content", analyzer)
@@ -86,4 +86,3 @@ results.scoreDocs.each {
     var doc = storedFields.document(it.doc)
     println "${doc.get('name')}"
 }
-
