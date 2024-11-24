@@ -51,19 +51,19 @@ var projects = ['math', 'spark', 'lucene', 'collections', 'deeplearning4j',
                 'beam', 'wayang', 'csv', 'io', 'numbers', 'ignite', 'mxnet',
                 'age', 'nlpcraft', 'pekko', 'kie', 'tinkerpop', 'commons',
                 'cli', 'opennlp', 'ofbiz', 'codec', 'hugegraph', 'flink']
-var namepart = new SpanMultiTermQueryWrapper(new RegexpQuery(
+var suffix = new SpanMultiTermQueryWrapper(new RegexpQuery(
     new Term('content', "(${projects.join('|')})")))
 
-// look for apache commons <namepart>
+// look for apache commons <suffix>
 SpanQuery[] spanTerms = ['apache', 'commons'].collect {
     new SpanTermQuery(new Term('content', it))
-} + namepart
+} + suffix
 var apacheCommons = new SpanNearQuery(spanTerms, 0, true)
 
-// look for (apache|eclipse) <namepart>
+// look for (apache|eclipse) <suffix>
 var foundation = new SpanMultiTermQueryWrapper(new RegexpQuery(
     new Term('content', '(apache|eclipse)')))
-var otherProject = new SpanNearQuery([foundation, namepart] as SpanQuery[], 0, true)
+var otherProject = new SpanNearQuery([foundation, suffix] as SpanQuery[], 0, true)
 
 var builder = new BooleanQuery.Builder(minimumNumberShouldMatch: 1)
 builder.add(otherProject, BooleanClause.Occur.SHOULD)

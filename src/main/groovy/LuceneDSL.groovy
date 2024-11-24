@@ -67,3 +67,7 @@ var suffix = "(${projects.join('|')})"
 var query = span('apache', 'commons', ~suffix) | span(~'(apache|eclipse)', ~suffix)
 var results = searcher.search(query, 30)
 println "Total documents with hits for $query --> $results.totalHits"
+
+query = span('jackson', 'databind') | span(~'virt.*', 'threads')
+results = searcher.search(query, 30)
+println "Total documents with hits for $query --> $results.totalHits"
