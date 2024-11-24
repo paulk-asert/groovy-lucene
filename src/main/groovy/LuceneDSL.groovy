@@ -51,7 +51,11 @@ var projects = ['math', 'spark', 'lucene', 'collections', 'deeplearning4j',
                 'cli', 'opennlp', 'ofbiz', 'codec', 'hugegraph', 'flink']
 
 def span(... spanTerms) {
-    SpanQuery[] terms = spanTerms.collect { term -> if (term instanceof String) new SpanTermQuery(new Term('content', term)) else new SpanMultiTermQueryWrapper(new RegexpQuery(new Term('content', term.toString())))
+    SpanQuery[] terms = spanTerms.collect { term ->
+        if (term instanceof String)
+            new SpanTermQuery(new Term('content', term))
+        else
+            new SpanMultiTermQueryWrapper(new RegexpQuery(new Term('content', term.toString())))
     }
     new SpanNearQuery(terms, 0, true)
 }
