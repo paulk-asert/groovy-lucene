@@ -76,13 +76,13 @@ var hitCounts = projects.getTopChildren(topN, "projectHitCounts").labelValues.co
 }
 
 println "\nFrequency of total hits mentioning a project (top $topN):"
-hitCounts.sort{ m -> -m.hits }.each { m ->
+hitCounts.each { m ->
     var label = "$m.label ($m.hits)"
     println "${label.padRight(32)} ${bar(m.hits, 0, 50, 50)}"
 }
 
 println "\nFrequency of documents mentioning a project (top $topN):"
-hitCounts.sort{ m -> -m.files }.each { m ->
+hitCounts.each { m ->
     var label = "$m.label ($m.files)"
     println "${label.padRight(32)} ${bar(m.files * 2, 0, 20, 20)}"
 }
