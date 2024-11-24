@@ -32,10 +32,10 @@ var indexWriter = new IndexWriter(indexDir, config)
 var taxonWriter = new DirectoryTaxonomyWriter(taxonDir)
 
 var fConfig = new FacetsConfig().tap {
-    setHierarchical("projectNameCounts", true)
-    setMultiValued("projectNameCounts", true)
-    setMultiValued("projectFileCounts", true)
-    setMultiValued("projectHitCounts", true)
+    setHierarchical('projectNameCounts', true)
+    setMultiValued('projectNameCounts', true)
+    setMultiValued('projectFileCounts', true)
+    setMultiValued('projectHitCounts', true)
     setIndexFieldName('projectHitCounts', '$projectHitCounts')
 }
 
@@ -52,9 +52,9 @@ new File(baseDir).traverse(nameFilter: ~/.*\.adoc/) { file ->
         if (projects) {
             println "$file.name: $projects"
             projects.each { k, v ->
-                document.add(new IntAssociationFacetField(v, "projectHitCounts", k))
-                document.add(new FacetField("projectFileCounts", k))
-                document.add(new FacetField("projectNameCounts", k.split()))
+                document.add(new IntAssociationFacetField(v, 'projectHitCounts', k))
+                document.add(new FacetField('projectFileCounts', k))
+                document.add(new FacetField('projectNameCounts', k.split()))
             }
         }
         indexWriter.addDocument(fConfig.build(taxonWriter, document))
@@ -71,35 +71,31 @@ var fc = FacetsCollectorManager.search(searcher, new MatchAllDocsQuery(), 0, fcm
 
 var topN = 5
 var projects = new TaxonomyFacetIntAssociations('$projectHitCounts', taxonReader, fConfig, fc, AssociationAggregationFunction.SUM)
-var hitCounts = projects.getTopChildren(topN, "projectHitCounts").labelValues.collect{
-    [label: it.label, hits: it.value, files: it.count]
-}
+var hitData = projects.getTopChildren(topN, 'projectHitCounts').labelValues
 
 println "\nFrequency of total hits mentioning a project (top $topN):"
-hitCounts.each { m ->
-    var label = "$m.label ($m.hits)"
-    println "${label.padRight(32)} ${bar(m.hits, 0, 50, 50)}"
+hitData.each { m ->
+    var label = "$m.label ($m.value)"
+    println "${label.padRight(32)} ${bar(m.value, 0, 50, 50)}"
 }
 
 println "\nFrequency of documents mentioning a project (top $topN):"
-hitCounts.each { m ->
-    var label = "$m.label ($m.files)"
-    println "${label.padRight(32)} ${bar(m.files * 2, 0, 20, 20)}"
+hitData.each { m ->
+    var label = "$m.label ($m.count)"
+    println "${label.padRight(32)} ${bar(m.count * 2, 0, 20, 20)}"
 }
 
 var facets = new FastTaxonomyFacetCounts(taxonReader, fConfig, fc)
 
 println "\nFrequency of documents mentioning a project (top $topN):"
-var fileCounts = facets.getTopChildren(topN, "projectFileCounts")
-println fileCounts
+println facets.getTopChildren(topN, 'projectFileCounts')
 
 ['apache', 'commons'].inits().reverseEach { path ->
     println "Frequency of documents mentioning a project with path $path (top $topN):"
-    var nameCounts = facets.getTopChildren(topN, "projectNameCounts", *path)
-    println "$nameCounts"
+    println "${facets.getTopChildren(topN, 'projectNameCounts', *path)}"
 }
 
-var parser = new QueryParser("content", analyzer)
+var parser = new QueryParser('content', analyzer)
 var query = parser.parse(/apache\ * AND eclipse\ * AND emoji*/)
 var results = searcher.search(query, topN)
 var storedFields = searcher.storedFields()
