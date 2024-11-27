@@ -19,5 +19,5 @@ class Common {
         )                                    # end capture term
     /
 
-    public static String baseDir = '/projects/apache-websites/groovy-website/site/src/site/blog'
+    public static String baseDir = '/projects/groovy-website/site/src/site/blog'
 }
