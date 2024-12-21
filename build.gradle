@@ -9,10 +9,10 @@ repositories {
 
 dependencies {
     implementation "org.apache.groovy:groovy:5.0.0-alpha-11"
-    implementation "org.apache.lucene:lucene-core:10.0.0"
-    implementation "org.apache.lucene:lucene-queryparser:10.0.0"
-    implementation "org.apache.lucene:lucene-highlighter:10.0.0"
-    implementation "org.apache.lucene:lucene-analysis-common:10.0.0"
+    implementation "org.apache.lucene:lucene-core:10.1.0"
+    implementation "org.apache.lucene:lucene-queryparser:10.1.0"
+    implementation "org.apache.lucene:lucene-highlighter:10.1.0"
+    implementation "org.apache.lucene:lucene-analysis-common:10.1.0"
 }
 
 sourceSets.main.allSource.files.each { file ->
