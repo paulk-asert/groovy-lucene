@@ -1,6 +1,4 @@
-import static Common.baseDir
-import static Common.tokenRegex
-import static org.codehaus.groovy.util.StringUtil.bar
+import static Common.*
 
 var histogram = [:].withDefault { 0 }
 
@@ -15,7 +13,4 @@ new File(baseDir).traverse(nameFilter: ~/.*\.adoc/) { file ->
 }
 
 println "\nFrequency of total hits mentioning a project:"
-histogram.sort { e -> -e.value }.each { k, v ->
-    var label = "$k ($v)"
-    println "${label.padRight(32)} ${bar(v, 0, 50, 50)}"
-}
+display(histogram.sort { e -> -e.value }, 50)

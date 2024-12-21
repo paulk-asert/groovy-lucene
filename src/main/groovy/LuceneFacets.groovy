@@ -20,9 +20,7 @@ import org.apache.lucene.search.IndexSearcher
 import org.apache.lucene.search.MatchAllDocsQuery
 import org.apache.lucene.store.ByteBuffersDirectory
 
-import static Common.baseDir
-import static Common.tokenRegex
-import static org.codehaus.groovy.util.StringUtil.bar
+import static Common.*
 
 var analyzer = new ProjectNameAnalyzer()
 var indexDir = new ByteBuffersDirectory()
@@ -74,16 +72,10 @@ var projects = new TaxonomyFacetIntAssociations('$projectHitCounts', taxonReader
 var hitData = projects.getTopChildren(topN, 'projectHitCounts').labelValues
 
 println "\nFrequency of total hits mentioning a project (top $topN):"
-hitData.each { m ->
-    var label = "$m.label ($m.value)"
-    println "${label.padRight(32)} ${bar(m.value, 0, 50, 50)}"
-}
+display(hitData.collectEntries{ lv -> [lv.label, lv.value] }, 50)
 
 println "\nFrequency of documents mentioning a project (top $topN):"
-hitData.each { m ->
-    var label = "$m.label ($m.count)"
-    println "${label.padRight(32)} ${bar(m.count * 2, 0, 20, 20)}"
-}
+display(hitData.collectEntries{ lv -> [lv.label, lv.count] }, 20, 2)
 
 var facets = new FastTaxonomyFacetCounts(taxonReader, fConfig, fc)
 

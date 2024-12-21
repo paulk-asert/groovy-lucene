@@ -15,8 +15,7 @@ import org.apache.lucene.search.vectorhighlight.FieldQuery
 import org.apache.lucene.search.vectorhighlight.FieldTermStack
 import org.apache.lucene.store.ByteBuffersDirectory
 
-import static Common.baseDir
-import static org.codehaus.groovy.util.StringUtil.bar
+import static Common.*
 
 var analyzer = new ProjectNameAnalyzer()
 var indexDir = new ByteBuffersDirectory()
@@ -56,10 +55,7 @@ results.scoreDocs.each { ScoreDoc scoreDoc ->
 }
 
 println "\nFrequency of total hits mentioning a project (top 10):"
-histogram.sort { e -> -e.value }.take(10).each { k, v ->
-    var label = "$k ($v)"
-    println "${label.padRight(32)} ${bar(v, 0, 50, 50)}"
-}
+display(histogram.sort { e -> -e.value }.take(10), 50)
 
 List<String> handleHit(ScoreDoc hit, Query query, DirectoryReader dirReader) {
     boolean phraseHighlight = true
